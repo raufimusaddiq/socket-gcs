@@ -53,7 +53,7 @@
 </div>
 <div class="margin">
     <input type="text" id="myAltitudeTakeoff" placeholder="Altitude (m)">
-    <button onclick="takeOff()" id="takeoffButton">TakeOff</button>
+    <button onclick="takeOff()" id="takeoffButton">TAKEOFF</button>
 </div>
 <div class="margin">
     <label>Command</label>
@@ -79,7 +79,7 @@
 <!--Script Websocket-->
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    //Connection Setuo
+    //Connection Setup
     const droneId = document.getElementById('myDrone');
     const pin = document.getElementById('myPin');
     const buttonConnect = document.getElementById('connectButton');
@@ -96,6 +96,8 @@
     //Command Setup
     const buttonArm = document.getElementById('armButton');
     const buttonLand = document.getElementById('landButton');
+    const buttonTakeoff = document.getElementById('takeoffButton');
+    const altitudeTakeoff = document.getElementById('myAltitudeTakeoff');
 
     //Info Setup
     const droneStatus = document.getElementById('drone-status');
@@ -166,33 +168,29 @@
     }
 
     function onStatusInfo(data) {
-        const newdata = JSON.parse(data)
-        console.log(newdata)
+        console.log(data)
         droneStatus.innerHTML = "";
-        droneStatus.appendChild(newStatusItem(newdata))
+        droneStatus.appendChild(newStatusItem(data))
     }
 
     function onMissionInfo(data) {
-        const newdata = JSON.parse(data)
-        console.log(newdata)
-        buttonLand.disabled = newdata.MissionStatus !== 'Ongoing Mission';
+        buttonLand.disabled = data.MissionStatus !== 'Ongoing Mission';
 
-        if (newdata.WaypointTotal === 0) {
+        if (data.WaypointTotal === 0) {
             buttonPushMission.disabled = false;
             buttonStartMission.disabled = true;
         } else buttonStartMission.disabled = false;
         missionStatus.innerHTML = "";
-        missionStatus.appendChild(newStatusItem(newdata))
+        missionStatus.appendChild(newStatusItem(data))
     }
 
     function onCommandInfo(data) {
-        const newdata = JSON.parse(data)
-        console.log(newdata)
-        if (newdata.status === 'Armed') {
+        console.log(data)
+        if (data.status === 'Armed') {
             buttonArm.innerText = "DISARM"
         } else buttonArm.innerText = "ARM"
         commandStatus.innerHTML = "";
-        commandStatus.appendChild(newStatusItem(newdata))
+        commandStatus.appendChild(newStatusItem(data))
     }
 
     function pushMission() {
@@ -218,7 +216,7 @@
     }
 
     function takeOff() {
-
+        socket.emit('command', {command:buttonTakeoff.innerText, altitude:altitudeTakeoff.value})
     }
 
 </script>

@@ -31,31 +31,31 @@ io.on('connect', socket => {
     socket.on('status-info', (status) => {
         console.log('received drone status-info from socket : ' + socket.id)
         console.log(status)
-        socket.to(Drone.room).emit('status-info', status)
+        socket.to(Drone.room).emit('status-info', JSON.parse(status))
     })
 
     socket.on('command-info', (status) => {
         console.log('received drone command-info from socket : ' + socket.id)
         console.log(status)
-        socket.to(Drone.room).emit('command-info', status)
+        socket.to(Drone.room).emit('command-info', JSON.parse(status))
     })
 
     socket.on('mission-info', (status) => {
         console.log('received drone mission-info from socket : ' + socket.id)
         console.log(status)
-        socket.to(Drone.room).emit('mission-info', status)
+        socket.to(Drone.room).emit('mission-info', JSON.parse(status))
     })
 
     socket.on('mission', (data) => {
         console.log(data)
         console.log('received mission from user : ' + socket.id)
-        socket.to(Drone.room).emit('missioned', data)
+        socket.to(Drone.room).emit('missioned', JSON.stringify(data))
     })
 
     socket.on('command', (data) => {
         console.log(data)
         console.log('received command from user : ' + socket.id)
-        socket.to(Drone.room).emit('commanded', data)
+        socket.to(Drone.room).emit('commanded', JSON.stringify(data))
     })
 
     socket.on('leave', droneName=>{
