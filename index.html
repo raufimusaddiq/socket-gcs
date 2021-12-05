@@ -166,30 +166,30 @@
     }
 
     function onStatusInfo(data) {
-        data = JSON.parse(data)
+        const newdata = JSON.parse(data)
         droneStatus.innerHTML = "";
-        droneStatus.appendChild(newStatusItem(data))
+        droneStatus.appendChild(newStatusItem(newdata))
     }
 
     function onMissionInfo(data) {
-        data = JSON.parse(data)
-        buttonLand.disabled = data.MissionStatus !== 'Ongoing Mission';
+        const newdata = JSON.parse(data)
+        buttonLand.disabled = newdata.MissionStatus !== 'Ongoing Mission';
 
-        if (data.WaypointTotal === 0) {
+        if (newdata.WaypointTotal === 0) {
             buttonPushMission.disabled = false;
             buttonStartMission.disabled = true;
         } else buttonStartMission.disabled = false;
         missionStatus.innerHTML = "";
-        missionStatus.appendChild(newStatusItem(data))
+        missionStatus.appendChild(newStatusItem(newdata))
     }
 
     function onCommandInfo(data) {
-        data = JSON.parse(data)
-        if (data.status === 'Armed') {
+        const newdata = JSON.parse(data)
+        if (newdata.status === 'Armed') {
             buttonArm.innerText = "DISARM"
         } else buttonArm.innerText = "ARM"
         commandStatus.innerHTML = "";
-        commandStatus.appendChild(newStatusItem(data))
+        commandStatus.appendChild(newStatusItem(newdata))
     }
 
     function pushMission() {
