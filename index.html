@@ -167,12 +167,14 @@
 
     function onStatusInfo(data) {
         const newdata = JSON.parse(data)
+        console.log(newdata)
         droneStatus.innerHTML = "";
         droneStatus.appendChild(newStatusItem(newdata))
     }
 
     function onMissionInfo(data) {
         const newdata = JSON.parse(data)
+        console.log(newdata)
         buttonLand.disabled = newdata.MissionStatus !== 'Ongoing Mission';
 
         if (newdata.WaypointTotal === 0) {
@@ -185,6 +187,7 @@
 
     function onCommandInfo(data) {
         const newdata = JSON.parse(data)
+        console.log(newdata)
         if (newdata.status === 'Armed') {
             buttonArm.innerText = "DISARM"
         } else buttonArm.innerText = "ARM"
