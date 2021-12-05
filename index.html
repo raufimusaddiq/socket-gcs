@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title>Drone Websocket Testing</title>
+    <!--Margining Style-->
+    <style>
+        .margin {
+            margin-top: 40px;
+            margin-left: 20px;
+        }
+
+        .data {
+            margin-top: 40px;
+            margin-left: 20px;
+            height: 200px;
+            width: 400px;
+            /* background-color:#CCC; */
+            overflow-y: auto;
+        }
+
+        .column {
+            margin-top: 40px;
+            float: left;
+            width: 30%;
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+<div class="margin">
+    <input type="text" id="myDrone" placeholder="Drone Name">
+    <input type="password" id="myPin" placeholder="Pin">
+    <button onclick="connect()" id="connectButton">Connect</button>
+    <button onclick="disconnect()" id="disconnectButton" disabled>Disconnect</button>
+</div>
+<div class="data">
+    <h3>Connection Log</h3>
+    <ul id="connectionEvents"></ul>
+</div>
+<div class="margin">
+    <input type="text" id="myLatitude" placeholder="Latitude">
+    <input type="text" id="myLongitude" placeholder="Longitude">
+    <input type="text" id="myAltitude" placeholder="Altitude (m)">
+    <button onclick="pushMission()" id="pushButton">Push</button>
+    <button onclick="startMission()" id="startButton" disabled>Start</button>
+</div>
+<div class="margin">
+    <input type="text" id="myAltitudeTakeoff" placeholder="Altitude (m)">
+    <button onclick="takeOff()" id="takeoffButton">TakeOff</button>
+</div>
+<div class="margin">
+    <label>Command</label>
+    <button onclick="pushArmCommand()" id="armButton">ARM</button>
+    <button onclick="setLand()" id="landButton" disabled>LAND</button>
+</div>
+<div class="row">
+    <div class="column">
+        <h3>Drone Status</h3>
+        <div id="drone-status"></div>
+    </div>
+    <div class="column">
+        <h3>Mission Status</h3>
+        <div id="mission-status"></div>
+    </div>
+    <div class="column">
+        <h3>Command Status</h3>
+        <ul id="command-status"></ul>
+    </div>
+</div>
+<!--<ul id="events"></ul>-->
+
+<!--Script Websocket-->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    //Connection Setuo
+    const droneId = document.getElementById('myDrone');
+    const pin = document.getElementById('myPin');
+    const buttonConnect = document.getElementById('connectButton');
+    const buttonDisconnect = document.getElementById('disconnectButton');
+    const $connectionEvent = document.getElementById('connectionEvents');
+
+    //Mission Setup
+    const latitudeSend = document.getElementById('myLatitude');
+    const longitudeSend = document.getElementById('myLongitude');
+    const altitudeSend = document.getElementById('myAltitude');
+    const buttonPushMission = document.getElementById('pushButton');
+    const buttonStartMission = document.getElementById('startButton');
+
+    //Command Setup
+    const buttonArm = document.getElementById('armButton');
+    const buttonLand = document.getElementById('landButton');
+
+    //Info Setup
+    const droneStatus = document.getElementById('drone-status');
+    const missionStatus = document.getElementById('mission-status');
+    const commandStatus = document.getElementById('command-status');
+
+    const newItem = (content) => {
+        const item = document.createElement('li');
+        item.innerText = content;
+        return item;
+    };
+
+    const newStatusItem = (content, divDocument) => {
+        const item = document.createElement('ul');
+        for (let key in content) {
+            item.appendChild(newItem(key + " : " + content[key]))
+        }
+        return item;
+    }
+
+    const socket = io("/", {
+        autoConnect: false,
+        forceNew: false
+    });
+
+
+    socket.on('connect', () => {
+        buttonConnect.disabled = true;
+        buttonDisconnect.disabled = false;
+        $connectionEvent.appendChild(newItem('socket : ' + socket.id + ' connected'));
+    });
+
+    socket.on('joined', onJoined);
+    socket.on('status-info', onStatusInfo);
+    socket.on('mission-info', onMissionInfo);
+    socket.on('command-info', onCommandInfo);
+    socket.on('left', onLeft);
+
+    socket.on('disconnect', (reason) => {
+        $connectionEvent.appendChild(newItem("socket has been disconnected :" + reason))
+    });
+
+    function connect() {
+        socket.io.opts.query = {
+            droneId: droneId.value,
+            pin: pin.value,
+        };
+        socket.open();
+        socket.emit('join', droneId.value);
+    }
+
+    function disconnect() {
+        socket.emit('leave', droneId.value);
+        droneId.set
+        buttonDisconnect.disabled = true;
+        buttonConnect.disabled = false;
+    }
+
+    function onJoined(joinedData) {
+        $connectionEvent.appendChild(newItem(joinedData))
+    }
+
+    function onLeft(data) {
+        $connectionEvent.appendChild(newItem(data));
+        socket.close();
+        buttonDisconnect.disabled = true;
+        buttonConnect.disabled = false;
+    }
+
+    function onStatusInfo(data) {
+        droneStatus.innerHTML = "";
+        droneStatus.appendChild(newStatusItem(data))
+    }
+
+    function onMissionInfo(data) {
+        buttonLand.disabled = data.MissionStatus !== 'Ongoing Mission';
+
+        if (data.WaypointTotal === 0) {
+            buttonPushMission.disabled = false;
+            buttonStartMission.disabled = true;
+        } else buttonStartMission.disabled = false;
+        missionStatus.innerHTML = "";
+        missionStatus.appendChild(newStatusItem(data))
+    }
+
+    function onCommandInfo(data) {
+        if (data.status === 'Armed') {
+            buttonArm.innerText = "DISARM"
+        } else buttonArm.innerText = "ARM"
+        commandStatus.innerHTML = "";
+        commandStatus.appendChild(newStatusItem(data))
+    }
+
+    function pushMission() {
+        const data = {
+            start: false,
+            lat: latitudeSend.value,
+            long: longitudeSend.value,
+            alt: altitudeSend.value
+        }
+        socket.emit('mission', data);
+    }
+
+    function startMission() {
+        socket.emit('mission', {start: true});
+    }
+
+    function pushArmCommand() {
+        socket.emit('command', {command: buttonArm.innerText});
+    }
+
+    function setLand() {
+        socket.emit('command', {command:buttonLand.innerText})
+    }
+
+    function takeOff() {
+
+    }
+
+</script>
+</body>
+</html>
