@@ -9,7 +9,7 @@ const server = require('http').createServer((req, res) => {
 const Drone = require('./drone.config');
 
 const io = require('socket.io')(server);
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8080;
 
 io.use((socket, next) => {
     const dataquery = socket.handshake.query;
@@ -48,13 +48,13 @@ io.on('connect', socket => {
 
     socket.on('mission', (data) => {
         console.log(data)
-        console.log('received mission from socket : ' + socket.id)
+        console.log('received mission from user : ' + socket.id)
         socket.to(Drone.room).emit('missioned', data)
     })
 
     socket.on('command', (data) => {
         console.log(data)
-        console.log('received command from socket : ' + socket.id)
+        console.log('received command from user : ' + socket.id)
         socket.to(Drone.room).emit('commanded', data)
     })
 
