@@ -176,6 +176,8 @@
 
     function onMissionInfo(data) {
         buttonLand.disabled = data.MissionStatus !== 'Ongoing Mission';
+        buttonArm.disabled = data.MissionStatus === 'Ongoing Mission';
+
         if (data.WaypointTotal<=0) {
             buttonPushMission.disabled = false;
             buttonStartMission.disabled = true;
