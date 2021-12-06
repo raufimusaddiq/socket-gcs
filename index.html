@@ -93,6 +93,7 @@
     const altitudeSend = document.getElementById('myAltitude');
     const buttonPushMission = document.getElementById('pushButton');
     const buttonStartMission = document.getElementById('startButton');
+    const buttonClearMission = document.getElementById('clearButton');
 
     //Command Setup
     const buttonArm = document.getElementById('armButton');
@@ -178,7 +179,11 @@
         if (data.WaypointTotal<=0) {
             buttonPushMission.disabled = false;
             buttonStartMission.disabled = true;
-        } else buttonStartMission.disabled = false;
+            buttonClearMission.disabled = true;
+        } else {
+            buttonStartMission.disabled = false;
+            buttonClearMission.disabled = true;
+        }
         missionStatus.innerHTML = "";
 
         missionStatus.appendChild(newStatusItem(data))
