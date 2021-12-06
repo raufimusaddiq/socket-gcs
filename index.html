@@ -49,6 +49,7 @@
     <input type="text" id="myLongitude" placeholder="Longitude">
     <input type="text" id="myAltitude" placeholder="Altitude (m)">
     <button onclick="pushMission()" id="pushButton">Push</button>
+    <button onclick="clearMission()" id="clearButton" disabled>Clear</button>
     <button onclick="startMission()" id="startButton" disabled>Start</button>
 </div>
 <div class="margin">
@@ -195,11 +196,16 @@
     function pushMission() {
         const data = {
             start: false,
+            clear : false,
             lat: latitudeSend.value,
             long: longitudeSend.value,
             alt: altitudeSend.value
         }
         socket.emit('mission', data);
+    }
+
+    function clearMission() {
+        socket.emit('mission', {clear:true})
     }
 
     function startMission() {
