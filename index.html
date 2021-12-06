@@ -205,7 +205,7 @@
     }
 
     function clearMission() {
-        socket.emit('mission', {clear:true})
+        socket.emit('mission', {start:false, clear:true})
     }
 
     function startMission() {
