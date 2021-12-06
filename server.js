@@ -24,7 +24,7 @@ io.on('connect', socket => {
     socket.on('join',(droneName)=>{
         socket.join(Drone.room, ()=>{
             console.log("socket : " + socket.id + " is joined to " + Object.keys(socket.rooms))
-            io.to(socket.id).emit('joined', 'I have joined ' + Object.keys(socket.rooms));
+            socket.to(Drone.room).emit('joined', 'I have joined ' + Object.keys(socket.rooms));
         })
     })
 
