@@ -45,6 +45,7 @@
     <ul id="connectionEvents"></ul>
 </div>
 <div class="margin">
+    <h3>Mission Controller</h3>
     <input type="text" id="myLatitude" placeholder="Latitude">
     <input type="text" id="myLongitude" placeholder="Longitude">
     <input type="text" id="myAltitude" placeholder="Altitude (m)">
@@ -53,8 +54,9 @@
     <button onclick="startMission()" id="startButton" disabled>Start</button>
 </div>
 <div class="margin">
+    <h3>Take Off Controller</h3>
     <input type="text" id="myAltitudeTakeoff" placeholder="Altitude (m)">
-    <button onclick="takeOff()" id="takeoffButton">TAKEOFF</button>
+    <button onclick="takeOff()" id="takeoffButton">SET</button>
 </div>
 <div class="margin">
     <label>Command</label>
@@ -178,16 +180,18 @@
         buttonLand.disabled = data.MissionStatus !== 'Ongoing Mission';
         buttonArm.disabled = data.MissionStatus === 'Ongoing Mission';
 
-        if (data.WaypointTotal<=0) {
-            buttonPushMission.disabled = false;
+        if(data.Mode === 'TAKEOFF'){
+            buttonTakeoff.innerText = data.Mode
             buttonStartMission.disabled = true;
             buttonClearMission.disabled = true;
-        } else {
+        }
+        else {
+            buttonTakeoff.innerText = 'SET'
             buttonStartMission.disabled = false;
             buttonClearMission.disabled = false;
         }
-        missionStatus.innerHTML = "";
 
+        missionStatus.innerHTML = "";
         missionStatus.appendChild(newStatusItem(data))
     }
 
