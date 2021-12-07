@@ -185,10 +185,14 @@
             buttonStartMission.disabled = true;
             buttonClearMission.disabled = true;
         }
-        else {
+        else if(data.Mode === 'MISSION') {
             buttonTakeoff.innerText = 'SET'
             buttonStartMission.disabled = false;
             buttonClearMission.disabled = false;
+        } else {
+            buttonTakeoff.innerText = 'SET'
+            buttonStartMission.disabled = true;
+            buttonClearMission.disabled = true;
         }
 
         missionStatus.innerHTML = "";
