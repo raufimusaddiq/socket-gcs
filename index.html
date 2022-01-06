@@ -83,7 +83,9 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     //Connection Setup
-    let i, j, k = 0;
+    let i = 0;
+    let j = 0;
+    let k = 0;
     const droneId = document.getElementById('myDrone');
     const pin = document.getElementById('myPin');
     const buttonConnect = document.getElementById('connectButton');
@@ -172,9 +174,10 @@
     }
 
     function onStatusInfo(data) {
+        const date = new Date();
         i++;
         console.log(i)
-        console.log("Data status Received: "+Date.now())
+        console.log("Data status Received: "+date.toTimeString())
         console.table(data)
 
         droneStatus.innerHTML = "";
