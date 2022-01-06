@@ -83,6 +83,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     //Connection Setup
+    let i, j, k = 0;
     const droneId = document.getElementById('myDrone');
     const pin = document.getElementById('myPin');
     const buttonConnect = document.getElementById('connectButton');
@@ -93,7 +94,6 @@
     const latitudeSend = document.getElementById('myLatitude');
     const longitudeSend = document.getElementById('myLongitude');
     const altitudeSend = document.getElementById('myAltitude');
-    const buttonPushMission = document.getElementById('pushButton');
     const buttonStartMission = document.getElementById('startButton');
     const buttonClearMission = document.getElementById('clearButton');
 
@@ -172,11 +172,19 @@
     }
 
     function onStatusInfo(data) {
+        i++;
+        console.log("Data status Received: "+Date.now())
+        console.table(data)
+
         droneStatus.innerHTML = "";
         droneStatus.appendChild(newStatusItem(data))
     }
 
     function onMissionInfo(data) {
+        j++;
+        console.log("Data mission Received: "+Date.now())
+        console.table(data)
+        
         buttonLand.disabled = data.MissionStatus !== 'Ongoing Mission';
         buttonArm.disabled = data.MissionStatus === 'Ongoing Mission';
 
@@ -200,6 +208,10 @@
     }
 
     function onCommandInfo(data) {
+        k++;
+        console.log("Data command received: " + Date.now())
+        console.table(data)
+
         if (data.status === 'Armed') {
             buttonArm.innerText = "DISARM"
         } else buttonArm.innerText = "ARM"
@@ -217,26 +229,32 @@
             alt: altitudeSend.value
         }
         socket.emit('mission', data);
+        console.log("Mission pushed at: "+Date.now())
     }
 
     function clearMission() {
-        socket.emit('mission', {start:false, clear:true})
+        socket.emit('mission', {start:false, clear:true});
+        console.log("Mission cleared at: "+Date.now());
     }
 
     function startMission() {
         socket.emit('mission', {start: true});
+        console.log("Mission started at: "+Date.now());
     }
 
     function pushArmCommand() {
         socket.emit('command', {command: buttonArm.innerText});
+        console.log("Drone commanded at: "+Date.now());
     }
 
     function setLand() {
         socket.emit('command', {command:buttonLand.innerText})
+        console.log("Drone commanded at: "+Date.now());
     }
 
     function takeOff() {
         socket.emit('command', {command:buttonTakeoff.innerText, altitude:altitudeTakeoff.value})
+        console.log("Drone commanded at: "+Date.now());
     }
 
 </script>
