@@ -173,6 +173,7 @@
 
     function onStatusInfo(data) {
         i++;
+        console.log(i)
         console.log("Data status Received: "+Date.now())
         console.table(data)
 
@@ -182,6 +183,7 @@
 
     function onMissionInfo(data) {
         j++;
+        console.log(j)
         console.log("Data mission Received: "+Date.now())
         console.table(data)
         
@@ -209,6 +211,7 @@
 
     function onCommandInfo(data) {
         k++;
+        console.log(k)
         console.log("Data command received: " + Date.now())
         console.table(data)
 
